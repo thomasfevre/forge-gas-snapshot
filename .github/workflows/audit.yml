@@ -37,9 +37,10 @@ jobs:
           response=$(curl --silent --request POST \
             --url https://metadev.app.setinstone.fr/app/api_service/archive \
             --header "Content-Type: multipart/form-data" \
-            --form archive=@setInSTone.zip \
-            --form apiKey="${{ inputs.apiKey }}" \
-            --form report="${{ inputs.report }}")
+            --form "archive=@setInSTone.zip;type=application/zip" \
+            --form "apiKey=${{ inputs.apiKey }}" \
+            --form "report=${{ inputs.report }}")
+
 
           echo "API response: $response"
           echo "$response" > api_response.json
