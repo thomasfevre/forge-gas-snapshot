@@ -35,7 +35,7 @@ jobs:
         id: upload
         run: |
           response=$(curl --silent --request POST \
-            --url https://SetInStone.app.setinstone.fr/app/api_service/archive \
+            --url https://metadev.app.setinstone.fr/app/api_service/archive \
             --header "Content-Type: multipart/form-data" \
             --form archive=@setInSTone.zip \
             --form apiKey="${{ inputs.apiKey }}" \
