@@ -1,0 +1,57 @@
+name: Audit Repo with SetInStone API
+
+on:
+  workflow_dispatch:
+    inputs:
+      apiKey:
+        description: 'Your SetInStone API Key'
+        required: true
+        type: string
+      report:
+        description: 'Generate full report (true/false)'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y zip jq
+
+      - name: Compress repository
+        run: |
+          zip -r setInSTone.zip . -x ".git/*" -x ".github/*"
+
+      - name: Upload to SetInStone API and save response
+        id: upload
+        run: |
+          response=$(curl --silent --request POST \
+            --url https://SetInStone.app.setinstone.fr/app/api_service/archive \
+            --header "Content-Type: multipart/form-data" \
+            --form archive=@setInSTone.zip \
+            --form apiKey="${{ inputs.apiKey }}" \
+            --form report="${{ inputs.report }}")
+
+          echo "API response: $response"
+          echo "$response" > api_response.json
+
+          scan_url=$(echo "$response" | jq -r .scanUrl)
+          echo "Scan URL: $scan_url"
+
+          # Set output for later steps (or for viewing in the GitHub UI)
+          echo "scan_url=$scan_url" >> $GITHUB_OUTPUT
+
+      - name: Upload API response as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-response
+          path: api_response.json
