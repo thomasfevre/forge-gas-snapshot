@@ -3,10 +3,6 @@ name: Audit Repo with SetInStone API
 on:
   workflow_dispatch:
     inputs:
-      apiKey:
-        description: 'Your SetInStone API Key'
-        required: true
-        type: string
       report:
         description: 'Generate full report (true/false)'
         required: true
@@ -51,7 +47,7 @@ jobs:
             --url https://metadev.app.setinstone.fr/app/api_service/archive \
             --header "Content-Type: multipart/form-data" \
             --form "archive=@$archive;type=application/zip" \
-            --form "apiKey=${{ inputs.apiKey }}" \
+            --form "apiKey=${{ secrets.SETINSTONE_API_KEY }}" \
             --form "report=${{ inputs.report }}")
           echo "API response: $response"
           echo "$response" > api_response.json
