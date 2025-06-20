@@ -43,7 +43,7 @@ jobs:
         id: upload
         run: |
           archive="${{ steps.vars.outputs.archive_name }}"
-          commit_sha="${{ github.sha::7 }}"
+          commit_sha="${{ GITHUB_SHA::7 }}"
           response=$(curl --silent --request POST \
             --url https://metadev.app.setinstone.fr/app/api_service/archive \
             --header "Content-Type: multipart/form-data" \
