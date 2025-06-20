@@ -38,24 +38,26 @@ jobs:
       - name: Compress repository
         run: |
           zip -r "${{ steps.vars.outputs.archive_name }}" . -x ".git/*" -x ".github/*"
-
-      - name: Upload to SetInStone API and save response
-        id: upload
-        run: |
-          archive="${{ steps.vars.outputs.archive_name }}"
-          response=$(curl --silent --request POST \
-            --url https://metadev.app.setinstone.fr/app/api_service/archive \
-            --header "Content-Type: multipart/form-data" \
-            --form "archive=@$archive;type=application/zip" \
-            --form "apiKey=${{ secrets.SETINSTONE_API_KEY }}" \
-            --form "report=${{ inputs.report }}")
-          echo "API response: $response"
-          echo "$response" > api_response.json
-          scan_url=$(echo "$response" | jq -r .scanUrl)
-          echo "Scan URL: $scan_url"
-          echo "scan_url=$scan_url" >> $GITHUB_OUTPUT
-
-
+     
+     - name: Upload to SetInStone API and save response
+			  id: upload
+			  run: |
+			    archive="${{ steps.vars.outputs.archive_name }}"
+			    commit_sha="${{ github.sha::7 }}"
+			    response=$(curl --silent --request POST \
+			      --url https://metadev.app.setinstone.fr/app/api_service/archive \
+			      --header "Content-Type: multipart/form-data" \
+			      --form "archive=@$archive;type=application/zip" \
+			      --form "apiKey=${{ secrets.SETINSTONE_API_KEY }}" \
+			      --form "report=${{ inputs.report }}" \
+			      --form "commit=$commit_sha")
+			    echo "API response: $response"
+			    echo "$response" > api_response.json
+			    scan_url=$(echo "$response" | jq -r .scanUrl)
+			    echo "Scan URL: $scan_url"
+			    echo "scan_url=$scan_url" >> $GITHUB_OUTPUT
+			
+     
       - name: Upload API response as artifact
         uses: actions/upload-artifact@v4
         with:
